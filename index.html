@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulazione INVALSI – Italiano Classe II</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --navy: #1b2a4a;
+  --blue: #2d5fa6;
+  --blue-light: #e8f0fb;
+  --teal: #17776b;
+  --teal-light: #e0f2ef;
+  --amber: #b45309;
+  --amber-light: #fef3c7;
+  --rose: #be123c;
+  --rose-light: #ffe4e6;
+  --slate: #475569;
+  --border: #cbd5e1;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #1e293b;
+  --ok: #15803d;
+  --ok-bg: #dcfce7;
+  --err: #dc2626;
+  --err-bg: #fee2e2;
+  --warn: #d97706;
+  --warn-bg: #fef9c3;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* ─── HEADER ─── */
+header {
+  background: var(--navy);
+  color: #fff;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue), var(--teal), var(--amber));
+}
+.header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 22px 20px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.header-badge {
+  background: var(--blue);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+header h1 {
+  font-family: 'Lora', serif;
+  font-size: clamp(1.1rem, 3vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+header p { font-size: 0.82rem; opacity: 0.65; margin-top: 3px; }
+
+/* ─── PROGRESS BAR ─── */
+.prog-bar-wrap {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 9px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 1px 8px rgba(0,0,0,.07);
+}
+.prog-bar-outer {
+  flex: 1;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.prog-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--teal));
+  border-radius: 99px;
+  transition: width .5s ease;
+  width: 0%;
+}
+.prog-label { font-size: 0.78rem; color: var(--slate); white-space: nowrap; }
+#score-live { font-weight: 700; color: var(--blue); }
+
+/* ─── MAIN ─── */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px 16px 80px;
+}
+
+/* ─── TAB NAV ─── */
+.tab-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 26px;
+}
+.tab-btn {
+  padding: 7px 15px;
+  border: 2px solid var(--border);
+  background: white;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--slate);
+  cursor: pointer;
+  transition: all .18s;
+  font-family: 'DM Sans', sans-serif;
+}
+.tab-btn:hover { border-color: var(--blue); color: var(--blue); }
+.tab-btn.on { background: var(--navy); color: white; border-color: var(--navy); }
+.tab-btn.done::after { content: ' ✓'; color: #4ade80; }
+
+/* ─── SECTION ─── */
+.sez { display: none; animation: fadeUp .3s ease both; }
+.sez.on { display: block; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+.sez-title {
+  font-family: 'Lora', serif;
+  font-size: 1.1rem;
+  color: var(--navy);
+  font-weight: 700;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--blue-light);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sez-tag {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  background: var(--blue);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+/* ─── BRANO ─── */
+.brano {
+  background: white;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 10px 10px 0;
+  padding: 20px 24px;
+  margin-bottom: 26px;
+  font-family: 'Lora', serif;
+  font-size: 0.9rem;
+  line-height: 1.95;
+  color: #2c3a50;
+}
+.brano-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--blue);
+  margin-bottom: 12px;
+}
+.brano p { margin-bottom: 10px; }
+.brano p:last-child { margin-bottom: 0; }
+.brano .note {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  color: var(--slate);
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.brano strong { color: var(--navy); }
+
+/* ─── INFOGRAFICA ─── */
+.infografica {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 26px;
+}
+.piramide-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 16px 0;
+}
+.piramide-livello {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: white;
+  border-radius: 6px;
+  padding: 8px 12px;
+  line-height: 1.3;
+}
+.p-lvl1 { background: #d32f2f; width: 120px; }
+.p-lvl2 { background: #f57c00; width: 200px; }
+.p-lvl3 { background: #f9a825; width: 290px; color: #333; }
+.p-lvl4 { background: #558b2f; width: 380px; }
+.p-lvl5 { background: #1565c0; width: 470px; }
+.p-lvl6 { background: #0d47a1; width: 560px; }
+.piramide-base {
+  background: #e3f2fd;
+  border: 2px solid #1565c0;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1565c0;
+  text-align: center;
+  width: 560px;
+  max-width: 100%;
+}
+.piramide-etichette {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+  font-size: 0.75rem;
+}
+.etichetta-dot {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ─── DOMANDA CARD ─── */
+.q-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  margin-bottom: 16px;
+  transition: box-shadow .2s;
+}
+.q-card:hover { box-shadow: 0 2px 16px rgba(45,95,166,.1); }
+
+.q-head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.q-num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: var(--navy);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 1px;
+}
+.q-text {
+  font-size: 0.93rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.q-text .cit {
+  display: block;
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.88rem;
+  background: var(--bg);
+  border-left: 3px solid var(--border);
+  padding: 6px 12px;
+  margin: 6px 0;
+  border-radius: 0 6px 6px 0;
+  color: var(--slate);
+}
+
+/* ─── RADIO OPTIONS ─── */
+.opts { display: flex; flex-direction: column; gap: 7px; margin-left: 40px; }
+.opt-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 13px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all .15s;
+  background: var(--bg);
+  user-select: none;
+}
+.opt-label:hover { border-color: var(--blue); background: var(--blue-light); }
+.opt-label input[type=radio] { accent-color: var(--blue); width: 15px; height: 15px; flex-shrink: 0; }
+.opt-label.ok { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); font-weight: 600; }
+.opt-label.no { border-color: var(--err); background: var(--err-bg); color: var(--err); }
+.opt-label.hint { border-color: var(--ok); background: var(--ok-bg); }
+
+/* ─── TEXTAREA ─── */
+.q-textarea {
+  display: block;
+  width: calc(100% - 40px);
+  margin-left: 40px;
+  padding: 9px 13px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg);
+  resize: vertical;
+  min-height: 65px;
+  transition: border-color .15s;
+}
+.q-textarea:focus { outline: none; border-color: var(--blue); background: white; }
+.q-textarea.ok { border-color: var(--ok); background: var(--ok-bg); }
+.q-textarea.no { border-color: var(--err); background: var(--err-bg); }
+
+/* ─── SELECT COMPLETAMENTO ─── */
+.slot {
+  border: 1.5px solid var(--blue);
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 0.88rem;
+  font-family: 'DM Sans', sans-serif;
+  background: white;
+  color: var(--blue);
+  cursor: pointer;
+  min-width: 100px;
+  transition: all .15s;
+}
+.slot:focus { outline: none; border-color: var(--navy); }
+.slot.ok { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+.slot.no { background: var(--err-bg); border-color: var(--err); color: var(--err); }
+
+.cloze-text {
+  font-size: 0.9rem;
+  line-height: 2.4;
+  margin-left: 40px;
+  color: var(--text);
+}
+
+/* ─── TABELLE V/F ─── */
+.vf-table, .abbina-table, .tri-table {
+  width: calc(100% - 40px);
+  margin-left: 40px;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+}
+.vf-table th, .abbina-table th, .tri-table th {
+  background: var(--navy);
+  color: white;
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+}
+.vf-table th:not(:first-child), .tri-table th:not(:first-child) { text-align: center; }
+.vf-table td, .abbina-table td, .tri-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+}
+.vf-table td:not(:first-child), .tri-table td:not(:first-child) { text-align: center; }
+.vf-table tr:nth-child(even) td,
+.abbina-table tr:nth-child(even) td,
+.tri-table tr:nth-child(even) td { background: var(--bg); }
+.vf-table input[type=radio],
+.tri-table input[type=radio] { accent-color: var(--blue); width: 15px; height: 15px; cursor: pointer; }
+.vf-table tr.r-ok td { background: var(--ok-bg) !important; }
+.vf-table tr.r-no td { background: var(--err-bg) !important; }
+.tri-table tr.r-ok td { background: var(--ok-bg) !important; }
+.tri-table tr.r-no td { background: var(--err-bg) !important; }
+.abbina-table select {
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 7px;
+  font-size: 0.84rem;
+  font-family: 'DM Sans', sans-serif;
+  min-width: 120px;
+  background: white;
+  cursor: pointer;
+}
+.abbina-table select.ok { background: var(--ok-bg); border-color: var(--ok); }
+.abbina-table select.no { background: var(--err-bg); border-color: var(--err); }
+
+/* ─── CHIP PAROLE ─── */
+.chips { margin-left: 40px; margin-bottom: 8px; font-size: 0.78rem; color: var(--slate); }
+.chip {
+  display: inline-block;
+  background: var(--blue-light);
+  border: 1px solid #bfdbfe;
+  color: var(--blue);
+  border-radius: 99px;
+  padding: 2px 9px;
+  margin: 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* ─── RANKING ─── */
+.rank-list {
+  margin-left: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.rank-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 13px;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: grab;
+  font-size: 0.9rem;
+  user-select: none;
+  transition: all .15s;
+}
+.rank-item:hover { border-color: var(--blue); background: var(--blue-light); }
+.rank-item:active { cursor: grabbing; opacity: .6; }
+.rank-item.dragging { opacity: .4; }
+.rank-item.over { border-color: var(--blue); background: var(--blue-light); }
+.rank-item .rnum {
+  width: 22px; height: 22px;
+  background: var(--navy);
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 700;
+  flex-shrink: 0;
+}
+.rank-item .drag-icon { color: var(--border); font-size: 1rem; margin-right: 2px; }
+.rank-item.ok { border-color: var(--ok); background: var(--ok-bg); }
+.rank-item.no { border-color: var(--err); background: var(--err-bg); }
+
+/* ─── BOTTONI ─── */
+.btn-check {
+  margin-top: 13px;
+  margin-left: 40px;
+  padding: 8px 20px;
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background .15s, transform .1s;
+}
+.btn-check:hover { background: var(--blue); transform: translateY(-1px); }
+.btn-check:disabled { background: var(--slate); cursor: default; transform: none; }
+
+.feedback {
+  display: none;
+  margin-top: 9px;
+  margin-left: 40px;
+  padding: 8px 13px;
+  border-radius: 7px;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+.feedback.ok { display: block; background: var(--ok-bg); color: var(--ok); border: 1px solid #86efac; }
+.feedback.no { display: block; background: var(--err-bg); color: var(--err); border: 1px solid #fca5a5; }
+.feedback.par { display: block; background: var(--warn-bg); color: var(--warn); border: 1px solid #fcd34d; }
+
+/* ─── NAVIGAZIONE INFERIORE ─── */
+.nav-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.btn-nav {
+  padding: 9px 22px;
+  border: 2px solid var(--navy);
+  background: white;
+  color: var(--navy);
+  border-radius: 9px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+}
+.btn-nav:hover, .btn-nav.pri { background: var(--navy); color: white; }
+
+/* ─── RISULTATI ─── */
+.risultati-wrap {
+  background: white;
+  border-radius: 16px;
+  padding: 36px 28px;
+  box-shadow: 0 4px 28px rgba(27,42,74,.12);
+  text-align: center;
+}
+.score-big { font-family: 'Lora', serif; font-size: 3.8rem; font-weight: 700; color: var(--navy); line-height: 1; }
+.score-sub { font-size: 0.88rem; color: var(--slate); margin-top: 4px; }
+.badge-livello {
+  display: inline-block;
+  margin: 16px auto;
+  padding: 7px 26px;
+  border-radius: 99px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+.badge-ok { background: var(--ok-bg); color: var(--ok); }
+.badge-par { background: var(--warn-bg); color: var(--warn); }
+.badge-no { background: var(--err-bg); color: var(--err); }
+.stats-grid {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.stat-box { text-align: center; }
+.stat-num { font-size: 2rem; font-weight: 700; font-family: 'Lora', serif; }
+.stat-lbl { font-size: 0.78rem; color: var(--slate); margin-top: 2px; }
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:600px) {
+  .opts, .q-textarea, .cloze-text, .chips, .rank-list,
+  .btn-check, .feedback, .vf-table, .abbina-table, .tri-table { margin-left: 0; width: 100%; }
+  .piramide-livello { max-width: 100%; width: 100% !important; }
+  .piramide-base { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-badge">📝</div>
+    <div>
+      <h1>Simulazione INVALSI — Italiano · Classe II</h1>
+      <p>Testo A · B · C · D · Riflessione sulla lingua &nbsp;|&nbsp; Esercizio interattivo originale</p>
+    </div>
+  </div>
+</header>
+
+<div class="prog-bar-wrap">
+  <div class="prog-bar-outer"><div class="prog-bar-inner" id="prog-bar"></div></div>
+  <div class="prog-label"><span id="score-live">0</span> corrette · <span id="ans-live">0</span> controllate</div>
+</div>
+
+<main>
+
+<!-- TABS -->
+<div class="tab-nav">
+  <button class="tab-btn on" id="tab0" onclick="showTab(0)">Testo A</button>
+  <button class="tab-btn" id="tab1" onclick="showTab(1)">Testo B</button>
+  <button class="tab-btn" id="tab2" onclick="showTab(2)">Testo C</button>
+  <button class="tab-btn" id="tab3" onclick="showTab(3)">Testo D</button>
+  <button class="tab-btn" id="tab4" onclick="showTab(4)">Lingua</button>
+  <button class="tab-btn" id="tab5" onclick="showTab(5)">📊 Risultati</button>
+</div>
+
+<!-- ════════════════════════════════════════
+     TESTO A — ARGOMENTATIVO
+     "I social media e la nostra attenzione"
+════════════════════════════════════════ -->
+<div class="sez on" id="s0">
+  <div class="sez-title"><span class="sez-tag">Testo A</span> Testo argomentativo</div>
+
+  <div class="brano">
+    <div class="brano-title">I social media e la nostra attenzione</div>
+    <p>Ogni giorno milioni di persone trascorrono ore davanti allo schermo di uno smartphone, scorrendo notizie, foto e video in un flusso apparentemente infinito. Questo comportamento, che molti considerano ormai normale, sta modificando in modo profondo il modo in cui il cervello umano elabora le informazioni e gestisce l'attenzione.</p>
+    <p>Gli esperti di neuroscienze hanno osservato che l'uso prolungato dei social media favorisce quella che viene chiamata <strong>attenzione frammentata</strong>: la mente si abitua a passare rapidamente da uno stimolo all'altro, perdendo la capacità di concentrarsi a lungo su un unico argomento. Uno studio condotto dall'Università di California ha rilevato che, nel 2004, la durata media dell'attenzione su uno schermo era di circa due minuti e mezzo; vent'anni dopo, si è ridotta a poco più di quarantasette secondi.</p>
+    <p>C'è chi sostiene che i social media abbiano anche aspetti positivi: permettono di restare in contatto con persone lontane, di informarsi rapidamente, di condividere esperienze. Tuttavia, questi vantaggi rischiano di essere vanificati se l'uso diventa compulsivo e incontrollato. La dipendenza dai social, ormai riconosciuta da molti psicologi come un fenomeno reale, si manifesta con il bisogno irresistibile di controllare continuamente notifiche e aggiornamenti, anche durante i pasti o nelle ore notturne.</p>
+    <p>La soluzione non è demonizzare la tecnologia, ma imparare a usarla con consapevolezza. Stabilire orari precisi per consultare i social, disattivare le notifiche e dedicare ogni giorno del tempo a letture o attività che richiedano concentrazione prolungata sono strategie che possono aiutare a recuperare quella capacità di attenzione che rischia di andare perduta. Come scrive la neuroscienziata Maryanne Wolf: «La mente che legge con profondità è la stessa mente che impara a riflettere, a empatizzare, a creare».</p>
+    <div class="note"><strong>Note — </strong><em>attenzione frammentata</em>: difficoltà a mantenere la concentrazione su un unico oggetto per un tempo prolungato. <em>compulsivo</em>: che nasce da un impulso difficile da controllare. <em>empatizzare</em>: comprendere e condividere i sentimenti altrui.</div>
+  </div>
+
+  <!-- A1 -->
+  <div class="q-card" id="cA1">
+    <div class="q-head"><div class="q-num">1</div>
+      <div class="q-text">Qual è l'argomento principale dell'articolo?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="A1" value="a"> a. I benefici della tecnologia nella vita quotidiana</label>
+      <label class="opt-label"><input type="radio" name="A1" value="b"> b. Il modo in cui i social media influenzano la nostra capacità di attenzione</label>
+      <label class="opt-label"><input type="radio" name="A1" value="c"> c. Come funziona il cervello umano durante la lettura</label>
+      <label class="opt-label"><input type="radio" name="A1" value="d"> d. Le cause della dipendenza da smartphone nei giovani</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('A1','b','cA1')">Controlla</button>
+    <div class="feedback" id="fb-A1"></div>
+  </div>
+
+  <!-- A2 -->
+  <div class="q-card" id="cA2">
+    <div class="q-head"><div class="q-num">2</div>
+      <div class="q-text">Secondo i dati riportati nel testo, di quanto si è ridotta la durata media dell'attenzione sullo schermo tra il 2004 e oggi?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="A2" value="a"> a. Da due minuti e mezzo a circa trenta secondi</label>
+      <label class="opt-label"><input type="radio" name="A2" value="b"> b. Da due minuti e mezzo a poco più di quarantasette secondi</label>
+      <label class="opt-label"><input type="radio" name="A2" value="c"> c. Da cinque minuti a due minuti</label>
+      <label class="opt-label"><input type="radio" name="A2" value="d"> d. Da un'ora a venti minuti</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('A2','b','cA2')">Controlla</button>
+    <div class="feedback" id="fb-A2"></div>
+  </div>
+
+  <!-- A3 testo libero -->
+  <div class="q-card" id="cA3">
+    <div class="q-head"><div class="q-num">3</div>
+      <div class="q-text">Con quale espressione l'autore descrive l'uso incontrollato dei social media? Trascrivi le parole esatte del testo (massimo 4 parole).</div></div>
+    <textarea class="q-textarea" id="A3" placeholder="Scrivi qui..."></textarea>
+    <button class="btn-check" onclick="checkLibero('A3','cA3',['uso compulsivo e incontrollato','compulsivo e incontrollato'])">Controlla</button>
+    <div class="feedback" id="fb-A3"></div>
+  </div>
+
+  <!-- A4 V/F -->
+  <div class="q-card" id="cA4">
+    <div class="q-head"><div class="q-num">4</div>
+      <div class="q-text">Indica se le seguenti affermazioni sono Vere (V) o False (F) secondo il testo.</div></div>
+    <table class="vf-table">
+      <thead><tr><th>Affermazione</th><th>V</th><th>F</th></tr></thead>
+      <tbody>
+        <tr id="rA4-1"><td>1. I social media non hanno alcun aspetto positivo secondo l'autore.</td><td><input type="radio" name="vfA4_1" value="V"></td><td><input type="radio" name="vfA4_1" value="F"></td></tr>
+        <tr id="rA4-2"><td>2. Lo studio citato proviene dall'Università di California.</td><td><input type="radio" name="vfA4_2" value="V"></td><td><input type="radio" name="vfA4_2" value="F"></td></tr>
+        <tr id="rA4-3"><td>3. La dipendenza dai social è riconosciuta da molti psicologi come un fenomeno reale.</td><td><input type="radio" name="vfA4_3" value="V"></td><td><input type="radio" name="vfA4_3" value="F"></td></tr>
+        <tr id="rA4-4"><td>4. L'autore propone di eliminare completamente i social media dalla propria vita.</td><td><input type="radio" name="vfA4_4" value="V"></td><td><input type="radio" name="vfA4_4" value="F"></td></tr>
+        <tr id="rA4-5"><td>5. Maryanne Wolf è una neuroscienziata.</td><td><input type="radio" name="vfA4_5" value="V"></td><td><input type="radio" name="vfA4_5" value="F"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-check" onclick="checkVF('A4',[{n:'vfA4_1',r:'F'},{n:'vfA4_2',r:'V'},{n:'vfA4_3',r:'V'},{n:'vfA4_4',r:'F'},{n:'vfA4_5',r:'V'}])">Controlla</button>
+    <div class="feedback" id="fb-A4"></div>
+  </div>
+
+  <!-- A5 -->
+  <div class="q-card" id="cA5">
+    <div class="q-head"><div class="q-num">5</div>
+      <div class="q-text">La parola <em>"compulsivo"</em> nel testo significa:</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="A5" value="a"> a. Volontario e ponderato</label>
+      <label class="opt-label"><input type="radio" name="A5" value="b"> b. Che nasce da un impulso difficile da controllare</label>
+      <label class="opt-label"><input type="radio" name="A5" value="c"> c. Legato alla vita in società</label>
+      <label class="opt-label"><input type="radio" name="A5" value="d"> d. Che riguarda l'utilizzo del computer</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('A5','b','cA5')">Controlla</button>
+    <div class="feedback" id="fb-A5"></div>
+  </div>
+
+  <!-- A6 -->
+  <div class="q-card" id="cA6">
+    <div class="q-head"><div class="q-num">6</div>
+      <div class="q-text">L'autore, alla fine del testo, cita le parole di Maryanne Wolf. Qual è lo scopo di questa citazione?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="A6" value="a"> a. Contraddire la tesi principale dell'articolo</label>
+      <label class="opt-label"><input type="radio" name="A6" value="b"> b. Introdurre un nuovo argomento non trattato in precedenza</label>
+      <label class="opt-label"><input type="radio" name="A6" value="c"> c. Rafforzare con l'autorevolezza di un'esperta il valore della lettura e della concentrazione</label>
+      <label class="opt-label"><input type="radio" name="A6" value="d"> d. Criticare i neuroscienziati che studiano il cervello</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('A6','c','cA6')">Controlla</button>
+    <div class="feedback" id="fb-A6"></div>
+  </div>
+
+  <!-- A7 completamento -->
+  <div class="q-card" id="cA7">
+    <div class="q-head"><div class="q-num">7</div>
+      <div class="q-text">Completa il testo scegliendo la parola corretta tra quelle proposte. <strong>Attenzione: ci sono 3 parole in più.</strong></div></div>
+    <div class="chips"><strong>Parole:</strong>
+      <span class="chip">notifiche</span><span class="chip">attenzione</span><span class="chip">lettura</span><span class="chip">dipendenza</span>
+      <span class="chip">veloce</span><span class="chip">frammentata</span><span class="chip">consapevolezza</span><span class="chip">tecnologia</span><span class="chip">stimoli</span>
+    </div>
+    <div class="cloze-text">
+      L'uso eccessivo dei social media porta a una forma di
+      <select class="slot" id="c7a"><option value="">—</option><option>attenzione</option><option>lettura</option><option>tecnologia</option><option>dipendenza</option></select>
+      che gli psicologi definiscono reale. Il cervello si abitua a ricevere molti
+      <select class="slot" id="c7b"><option value="">—</option><option>stimoli</option><option>notifiche</option><option>veloce</option><option>frammentata</option></select>
+      in poco tempo, sviluppando un'attenzione
+      <select class="slot" id="c7c"><option value="">—</option><option>frammentata</option><option>consapevolezza</option><option>veloce</option><option>lettura</option></select>.
+      Per contrastare questo fenomeno è necessario usare la
+      <select class="slot" id="c7d"><option value="">—</option><option>tecnologia</option><option>notifiche</option><option>dipendenza</option><option>stimoli</option></select>
+      con maggiore
+      <select class="slot" id="c7e"><option value="">—</option><option>consapevolezza</option><option>lettura</option><option>attenzione</option><option>veloce</option></select>.
+    </div>
+    <button class="btn-check" onclick="checkCloze(['c7a','c7b','c7c','c7d','c7e'],['dipendenza','stimoli','frammentata','tecnologia','consapevolezza'],'cA7')">Controlla</button>
+    <div class="feedback" id="fb-A7"></div>
+  </div>
+
+  <!-- A8 -->
+  <div class="q-card" id="cA8">
+    <div class="q-head"><div class="q-num">8</div>
+      <div class="q-text">Quale delle seguenti strategie <strong>non</strong> viene suggerita nel testo per recuperare la capacità di attenzione?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="A8" value="a"> a. Stabilire orari precisi per consultare i social</label>
+      <label class="opt-label"><input type="radio" name="A8" value="b"> b. Disattivare le notifiche</label>
+      <label class="opt-label"><input type="radio" name="A8" value="c"> c. Cancellare tutti i profili social</label>
+      <label class="opt-label"><input type="radio" name="A8" value="d"> d. Dedicare tempo a letture che richiedano concentrazione prolungata</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('A8','c','cA8')">Controlla</button>
+    <div class="feedback" id="fb-A8"></div>
+  </div>
+
+  <div class="nav-bottom">
+    <span></span>
+    <button class="btn-nav pri" onclick="showTab(1)">Testo B →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TESTO B — NARRATIVO
+     "Il sentiero del bosco" (racconto originale)
+════════════════════════════════════════ -->
+<div class="sez" id="s1">
+  <div class="sez-title"><span class="sez-tag">Testo B</span> Testo narrativo</div>
+
+  <div class="brano">
+    <div class="brano-title">Il sentiero del bosco</div>
+    <p>Quella mattina Lorenzo si svegliò prima dell'alba. Fuori dalla finestra il cielo era ancora grigio e i rami degli alberi disegnavano ombre lunghe sul muro bianco della sua camera. Si alzò in silenzio, cercando di non disturbare il fratello che dormiva nel letto accanto, e indossò i vestiti che aveva preparato la sera prima.</p>
+    <p>Erano le sei e un quarto quando uscì di casa. L'aria aveva quel profumo umido e fresco che si sente solo all'alba, quando il mondo sembra ancora mezzo addormentato. Lorenzo camminava in fretta, le mani in tasca e lo zaino sulle spalle, seguendo il sentiero di ghiaia che costeggiava il torrente.</p>
+    <p>Da tre settimane stava cercando di fotografare il martin pescatore¹ che aveva visto una mattina per caso, posato su un ramo sporgente sull'acqua. Era un uccello dal piumaggio straordinario — il dorso azzurro, il petto arancione acceso — e da quel giorno Lorenzo non riusciva a smettere di pensarci. Aveva comprato un libro sugli uccelli del bosco, aveva studiato le abitudini del martin pescatore, aveva segnato sul taccuino gli orari in cui era più probabile vederlo.</p>
+    <p>Quel mattino, però, qualcosa era diverso. Appena svoltò l'ultimo tornante del sentiero, vide che il ramo dove il martin pescatore di solito sostava era spezzato, caduto in acqua durante la tempesta della notte. Lorenzo si fermò, deluso. Poi, quasi senza volerlo, alzò gli occhi: e lì, su un ramo ancora più alto, c'era l'uccello. Lo osservò immobile per qualche secondo, poi con gesto lentissimo portò la macchina fotografica all'occhio e scattò.</p>
+    <p>Tornò a casa con il cuore leggero. Non sapeva ancora se la fotografia sarebbe venuta bene, ma non importava. Aveva imparato che la pazienza, a volte, viene ricompensata nei modi più inaspettati.</p>
+    <div class="note"><strong>Note — </strong>¹ <em>martin pescatore</em>: piccolo uccello dal piumaggio variopinto che vive vicino a fiumi e torrenti.</div>
+  </div>
+
+  <!-- B1 -->
+  <div class="q-card" id="cB1">
+    <div class="q-head"><div class="q-num">1</div>
+      <div class="q-text">In quale momento della giornata si svolge la storia?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="B1" value="a"> a. A mezzogiorno</label>
+      <label class="opt-label"><input type="radio" name="B1" value="b"> b. Al tramonto</label>
+      <label class="opt-label"><input type="radio" name="B1" value="c"> c. All'alba, prima che il sole sorga completamente</label>
+      <label class="opt-label"><input type="radio" name="B1" value="d"> d. Di notte</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('B1','c','cB1')">Controlla</button>
+    <div class="feedback" id="fb-B1"></div>
+  </div>
+
+  <!-- B2 -->
+  <div class="q-card" id="cB2">
+    <div class="q-head"><div class="q-num">2</div>
+      <div class="q-text">Da quante settimane Lorenzo stava cercando di fotografare il martin pescatore?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="B2" value="a"> a. Da una settimana</label>
+      <label class="opt-label"><input type="radio" name="B2" value="b"> b. Da due settimane</label>
+      <label class="opt-label"><input type="radio" name="B2" value="c"> c. Da tre settimane</label>
+      <label class="opt-label"><input type="radio" name="B2" value="d"> d. Dal testo non si può dedurre</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('B2','c','cB2')">Controlla</button>
+    <div class="feedback" id="fb-B2"></div>
+  </div>
+
+  <!-- B3 testo libero -->
+  <div class="q-card" id="cB3">
+    <div class="q-head"><div class="q-num">3</div>
+      <div class="q-text">Come viene descritto il piumaggio del martin pescatore? Trascrivi le parole esatte del testo.</div></div>
+    <textarea class="q-textarea" id="B3" placeholder="Copia le parole dal testo..."></textarea>
+    <button class="btn-check" onclick="checkLibero('B3','cB3',['dorso azzurro','petto arancione','azzurro','arancione'])">Controlla</button>
+    <div class="feedback" id="fb-B3"></div>
+  </div>
+
+  <!-- B4 V/F -->
+  <div class="q-card" id="cB4">
+    <div class="q-head"><div class="q-num">4</div>
+      <div class="q-text">Indica se le seguenti affermazioni sono Vere (V) o False (F).</div></div>
+    <table class="vf-table">
+      <thead><tr><th>Affermazione</th><th>V</th><th>F</th></tr></thead>
+      <tbody>
+        <tr id="rB4-1"><td>1. Lorenzo vive da solo.</td><td><input type="radio" name="vfB4_1" value="V"></td><td><input type="radio" name="vfB4_1" value="F"></td></tr>
+        <tr id="rB4-2"><td>2. Lorenzo aveva preparato i vestiti la sera prima.</td><td><input type="radio" name="vfB4_2" value="V"></td><td><input type="radio" name="vfB4_2" value="F"></td></tr>
+        <tr id="rB4-3"><td>3. Il ramo dove sostava il martin pescatore era stato spezzato da una tempesta.</td><td><input type="radio" name="vfB4_3" value="V"></td><td><input type="radio" name="vfB4_3" value="F"></td></tr>
+        <tr id="rB4-4"><td>4. Lorenzo trovò l'uccello sullo stesso ramo di sempre.</td><td><input type="radio" name="vfB4_4" value="V"></td><td><input type="radio" name="vfB4_4" value="F"></td></tr>
+        <tr id="rB4-5"><td>5. Alla fine Lorenzo scattò la fotografia all'uccello.</td><td><input type="radio" name="vfB4_5" value="V"></td><td><input type="radio" name="vfB4_5" value="F"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-check" onclick="checkVF('B4',[{n:'vfB4_1',r:'F'},{n:'vfB4_2',r:'V'},{n:'vfB4_3',r:'V'},{n:'vfB4_4',r:'F'},{n:'vfB4_5',r:'V'}])">Controlla</button>
+    <div class="feedback" id="fb-B4"></div>
+  </div>
+
+  <!-- B5 -->
+  <div class="q-card" id="cB5">
+    <div class="q-head"><div class="q-num">5</div>
+      <div class="q-text"><span class="cit">"L'aria aveva quel profumo umido e fresco che si sente solo all'alba, quando il mondo sembra ancora mezzo addormentato."</span>
+      Questa frase contiene una figura retorica. Quale?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="B5" value="a"> a. Un'iperbole</label>
+      <label class="opt-label"><input type="radio" name="B5" value="b"> b. Una personificazione (il mondo sembra addormentato)</label>
+      <label class="opt-label"><input type="radio" name="B5" value="c"> c. Un'anafora</label>
+      <label class="opt-label"><input type="radio" name="B5" value="d"> d. Una metafora</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('B5','b','cB5')">Controlla</button>
+    <div class="feedback" id="fb-B5"></div>
+  </div>
+
+  <!-- B6 sensazioni -->
+  <div class="q-card" id="cB6">
+    <div class="q-head"><div class="q-num">6</div>
+      <div class="q-text">I sensi (vista, udito, olfatto, tatto) sono presenti nella descrizione del bosco. Abbina ciascuna espressione al senso cui si riferisce.</div></div>
+    <table class="abbina-table">
+      <thead><tr><th>Espressione</th><th>Senso</th></tr></thead>
+      <tbody>
+        <tr><td>«quel profumo umido e fresco»</td>
+          <td><select id="s6a"><option value="">—</option><option>Vista</option><option>Udito</option><option>Olfatto</option><option>Tatto</option></select></td></tr>
+        <tr><td>«i rami degli alberi disegnavano ombre lunghe»</td>
+          <td><select id="s6b"><option value="">—</option><option>Vista</option><option>Udito</option><option>Olfatto</option><option>Tatto</option></select></td></tr>
+        <tr><td>«si svegliò prima dell'alba» — silenzio intorno</td>
+          <td><select id="s6c"><option value="">—</option><option>Vista</option><option>Udito</option><option>Olfatto</option><option>Tatto</option></select></td></tr>
+        <tr><td>«l'aria aveva quel profumo... fresco»</td>
+          <td><select id="s6d"><option value="">—</option><option>Vista</option><option>Udito</option><option>Olfatto</option><option>Tatto</option></select></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-check" onclick="checkAbbina(['s6a','s6b','s6c','s6d'],['Olfatto','Vista','Udito','Tatto'],'cB6')">Controlla</button>
+    <div class="feedback" id="fb-B6"></div>
+  </div>
+
+  <!-- B7 -->
+  <div class="q-card" id="cB7">
+    <div class="q-head"><div class="q-num">7</div>
+      <div class="q-text">Quale tema principale emerge dal finale del racconto?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="B7" value="a"> a. La frustrazione per gli imprevisti della natura</label>
+      <label class="opt-label"><input type="radio" name="B7" value="b"> b. Il valore della pazienza e della perseveranza</label>
+      <label class="opt-label"><input type="radio" name="B7" value="c"> c. L'importanza della fotografia come arte</label>
+      <label class="opt-label"><input type="radio" name="B7" value="d"> d. Il rapporto conflittuale tra uomo e natura</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('B7','b','cB7')">Controlla</button>
+    <div class="feedback" id="fb-B7"></div>
+  </div>
+
+  <!-- B8 -->
+  <div class="q-card" id="cB8">
+    <div class="q-head"><div class="q-num">8</div>
+      <div class="q-text">Il racconto è narrato:</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="B8" value="a"> a. In prima persona da Lorenzo</label>
+      <label class="opt-label"><input type="radio" name="B8" value="b"> b. In seconda persona</label>
+      <label class="opt-label"><input type="radio" name="B8" value="c"> c. In terza persona da un narratore esterno</label>
+      <label class="opt-label"><input type="radio" name="B8" value="d"> d. In prima persona dal fratello di Lorenzo</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('B8','c','cB8')">Controlla</button>
+    <div class="feedback" id="fb-B8"></div>
+  </div>
+
+  <div class="nav-bottom">
+    <button class="btn-nav" onclick="showTab(0)">← Testo A</button>
+    <button class="btn-nav pri" onclick="showTab(2)">Testo C →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TESTO C — ICONICO / INFOGRAFICA
+     "Il ciclo dell'acqua"
+════════════════════════════════════════ -->
+<div class="sez" id="s2">
+  <div class="sez-title"><span class="sez-tag">Testo C</span> Testo iconico-visivo (infografica)</div>
+
+  <div class="infografica">
+    <div class="brano-title">Il ciclo dell'acqua — schema riassuntivo</div>
+    <p style="font-size:0.85rem;color:var(--slate);margin-bottom:16px">Osserva con attenzione lo schema qui sotto, poi rispondi alle domande.</p>
+
+    <!-- Schema ciclo acqua testuale/visivo -->
+    <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:18px;font-size:0.83rem;color:#0c4a6e;margin-bottom:14px;">
+      <div style="font-weight:700;font-size:0.9rem;margin-bottom:12px;color:#0369a1;">♻️ IL CICLO DELL'ACQUA — Le 6 fasi principali</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+        <div style="background:white;border-radius:8px;padding:10px;border:1px solid #bae6fd;">
+          <div style="font-weight:700;color:#0369a1;">① Evaporazione</div>
+          <div>Il sole riscalda l'acqua di mari, laghi e fiumi: l'acqua si trasforma in vapore acqueo e sale in atmosfera.</div>
+        </div>
+        <div style="background:white;border-radius:8px;padding:10px;border:1px solid #bae6fd;">
+          <div style="font-weight:700;color:#0369a1;">② Traspirazione</div>
+          <div>Le piante rilasciano vapore acqueo attraverso le foglie (processo chiamato <em>traspirazione fogliare</em>).</div>
+        </div>
+        <div style="background:white;border-radius:8px;padding:10px;border:1px solid #bae6fd;">
+          <div style="font-weight:700;color:#0369a1;">③ Condensazione</div>
+          <div>Il vapore acqueo sale in quota, si raffredda e si trasforma in minuscole goccioline d'acqua che formano le nuvole.</div>
+        </div>
+        <div style="background:white;border-radius:8px;padding:10px;border:1px solid #bae6fd;">
+          <div style="font-weight:700;color:#0369a1;">④ Precipitazione</div>
+          <div>Le goccioline si uniscono e cadono al suolo sotto forma di pioggia, neve o grandine.</div>
+        </div>
+        <div style="background:white;border-radius:8px;padding:10px;border:1px solid #bae6fd;">
+          <div style="font-weight:700;color:#0369a1;">⑤ Scorrimento superficiale</div>
+          <div>L'acqua piovana scorre sulla superficie terrestre verso fiumi, laghi e mare.</div>
+        </div>
+        <div style="background:white;border-radius:8px;padding:10px;border:1px solid #bae6fd;">
+          <div style="font-weight:700;color:#0369a1;">⑥ Infiltrazione</div>
+          <div>Parte dell'acqua penetra nel suolo, alimentando le <em>falde acquifere</em> sotterranee.</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px;background:#e0f2fe;border-radius:8px;">
+        <strong>💧 Dato importante:</strong> Il pianeta Terra possiede circa 1,4 miliardi di km³ di acqua totale. Di questa, il 97,5% è acqua salata (oceani e mari), il 2,5% è acqua dolce. Di quest'ultima, il 69% è bloccata nei ghiacciai, il 30% è acqua sotterranea, e solo l'1% è disponibile come acqua dolce accessibile.
+      </div>
+    </div>
+  </div>
+
+  <!-- C1 -->
+  <div class="q-card" id="cC1">
+    <div class="q-head"><div class="q-num">1</div>
+      <div class="q-text">Perché lo schema si chiama "ciclo" dell'acqua?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="C1" value="a"> a. Perché l'acqua si muove solo in un senso</label>
+      <label class="opt-label"><input type="radio" name="C1" value="b"> b. Perché il processo si ripete continuamente e non ha un punto di inizio o di fine definitivo</label>
+      <label class="opt-label"><input type="radio" name="C1" value="c"> c. Perché riguarda solo i cicli stagionali</label>
+      <label class="opt-label"><input type="radio" name="C1" value="d"> d. Perché è stato scoperto da un matematico</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('C1','b','cC1')">Controlla</button>
+    <div class="feedback" id="fb-C1"></div>
+  </div>
+
+  <!-- C2 -->
+  <div class="q-card" id="cC2">
+    <div class="q-head"><div class="q-num">2</div>
+      <div class="q-text">Quale fase del ciclo riguarda le piante? Scrivi il nome della fase e spiegane brevemente il significato.</div></div>
+    <textarea class="q-textarea" id="C2" placeholder="Scrivi qui..."></textarea>
+    <button class="btn-check" onclick="checkLibero('C2','cC2',['traspirazione','fogliare','piante','vapore'])">Controlla</button>
+    <div class="feedback" id="fb-C2"></div>
+  </div>
+
+  <!-- C3 ordine -->
+  <div class="q-card" id="cC3">
+    <div class="q-head"><div class="q-num">3</div>
+      <div class="q-text">Metti in ordine le seguenti fasi del ciclo dell'acqua (trascinale dalla più iniziale alla più finale). <em>L'ordine considerato parte dall'evaporazione.</em></div></div>
+    <div class="rank-list" id="rankC3">
+      <div class="rank-item" draggable="true" data-v="Condensazione"><span class="drag-icon">⠿</span><span class="rnum">?</span> Condensazione</div>
+      <div class="rank-item" draggable="true" data-v="Precipitazione"><span class="drag-icon">⠿</span><span class="rnum">?</span> Precipitazione</div>
+      <div class="rank-item" draggable="true" data-v="Infiltrazione"><span class="drag-icon">⠿</span><span class="rnum">?</span> Infiltrazione</div>
+      <div class="rank-item" draggable="true" data-v="Scorrimento superficiale"><span class="drag-icon">⠿</span><span class="rnum">?</span> Scorrimento superficiale</div>
+    </div>
+    <button class="btn-check" onclick="checkRank('rankC3',['Condensazione','Precipitazione','Scorrimento superficiale','Infiltrazione'],'cC3')">Controlla</button>
+    <div class="feedback" id="fb-C3"></div>
+  </div>
+
+  <!-- C4 V/F -->
+  <div class="q-card" id="cC4">
+    <div class="q-head"><div class="q-num">4</div>
+      <div class="q-text">Indica se le seguenti affermazioni sono Vere (V) o False (F) in base allo schema.</div></div>
+    <table class="vf-table">
+      <thead><tr><th>Affermazione</th><th>V</th><th>F</th></tr></thead>
+      <tbody>
+        <tr id="rC4-1"><td>1. La maggior parte dell'acqua terrestre è acqua dolce.</td><td><input type="radio" name="vfC4_1" value="V"></td><td><input type="radio" name="vfC4_1" value="F"></td></tr>
+        <tr id="rC4-2"><td>2. Il vapore acqueo si forma solo per evaporazione dagli oceani.</td><td><input type="radio" name="vfC4_2" value="V"></td><td><input type="radio" name="vfC4_2" value="F"></td></tr>
+        <tr id="rC4-3"><td>3. Le falde acquifere sono alimentate dall'infiltrazione.</td><td><input type="radio" name="vfC4_3" value="V"></td><td><input type="radio" name="vfC4_3" value="F"></td></tr>
+        <tr id="rC4-4"><td>4. La grandine è una forma di precipitazione.</td><td><input type="radio" name="vfC4_4" value="V"></td><td><input type="radio" name="vfC4_4" value="F"></td></tr>
+        <tr id="rC4-5"><td>5. Solo il 30% dell'acqua dolce è sotterranea.</td><td><input type="radio" name="vfC4_5" value="V"></td><td><input type="radio" name="vfC4_5" value="F"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-check" onclick="checkVF('C4',[{n:'vfC4_1',r:'F'},{n:'vfC4_2',r:'F'},{n:'vfC4_3',r:'V'},{n:'vfC4_4',r:'V'},{n:'vfC4_5',r:'V'}])">Controlla</button>
+    <div class="feedback" id="fb-C4"></div>
+  </div>
+
+  <!-- C5 -->
+  <div class="q-card" id="cC5">
+    <div class="q-head"><div class="q-num">5</div>
+      <div class="q-text">La parola <em>"falde acquifere"</em> indica:</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="C5" value="a"> a. Le nuvole che portano pioggia</label>
+      <label class="opt-label"><input type="radio" name="C5" value="b"> b. Gli strati di acqua che scorrono in superficie</label>
+      <label class="opt-label"><input type="radio" name="C5" value="c"> c. Gli strati di acqua presenti nel sottosuolo</label>
+      <label class="opt-label"><input type="radio" name="C5" value="d"> d. I ghiacciai montani</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('C5','c','cC5')">Controlla</button>
+    <div class="feedback" id="fb-C5"></div>
+  </div>
+
+  <!-- C6 -->
+  <div class="q-card" id="cC6">
+    <div class="q-head"><div class="q-num">6</div>
+      <div class="q-text">Quale percentuale dell'acqua dolce terrestre è effettivamente accessibile (non bloccata nei ghiacciai né sotterranea)?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="C6" value="a"> a. Il 69%</label>
+      <label class="opt-label"><input type="radio" name="C6" value="b"> b. Il 30%</label>
+      <label class="opt-label"><input type="radio" name="C6" value="c"> c. Il 2,5%</label>
+      <label class="opt-label"><input type="radio" name="C6" value="d"> d. L'1%</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('C6','d','cC6')">Controlla</button>
+    <div class="feedback" id="fb-C6"></div>
+  </div>
+
+  <div class="nav-bottom">
+    <button class="btn-nav" onclick="showTab(1)">← Testo B</button>
+    <button class="btn-nav pri" onclick="showTab(3)">Testo D →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TESTO D — SCIENTIFICO/ESPOSITIVO
+     "La luce e i colori"
+════════════════════════════════════════ -->
+<div class="sez" id="s3">
+  <div class="sez-title"><span class="sez-tag">Testo D</span> Testo scientifico-espositivo</div>
+
+  <div class="brano">
+    <div class="brano-title">La luce e i colori</div>
+    <p>La luce che percepiamo con i nostri occhi è solo una piccola parte dell'enorme spettro delle radiazioni elettromagnetiche. Questa porzione visibile, chiamata <strong>luce visibile</strong>, comprende tutte le lunghezze d'onda che il nostro occhio è in grado di rilevare, che vanno dal violetto (con lunghezze d'onda più corte) al rosso (con lunghezze d'onda più lunghe).</p>
+    <p>Quando la luce bianca del sole attraversa un prisma di vetro, si scompone nei sette colori dell'arcobaleno: rosso, arancione, giallo, verde, azzurro, indaco e violetto. Questo fenomeno, chiamato <strong>dispersione</strong>, avviene perché i diversi colori si propagano attraverso il vetro a velocità leggermente diverse, vengono quindi deviati di angoli diversi e si separano tra loro.</p>
+    <p>Ma come mai gli oggetti che ci circondano hanno colori diversi? Ogni materiale assorbe alcune lunghezze d'onda della luce e ne riflette altre. Il colore che noi percepiamo è quello delle lunghezze d'onda riflesse. Una foglia ci appare verde perché assorbe le radiazioni rosse e blu e riflette quelle verdi. Un oggetto bianco riflette quasi tutte le lunghezze d'onda, mentre un oggetto nero le assorbe quasi tutte.</p>
+    <p>Il cielo ci sembra blu per un motivo diverso: non per riflessione, ma per un fenomeno chiamato <strong>diffusione di Rayleigh</strong>. Le molecole dell'aria disperdono la luce blu in tutte le direzioni con maggiore efficacia rispetto agli altri colori. Ecco perché, guardando il cielo in qualsiasi direzione, vediamo prevalentemente la luce blu che è stata diffusa verso di noi.</p>
+    <p>La comprensione della luce e dei colori ha avuto conseguenze importantissime in molti settori: dalla fotografia alla medicina (dove la luce è usata in diagnosi e terapie), dalla pittura alla televisione. La fisica della luce è, in un certo senso, alla base del modo in cui percepiamo il mondo intero.</p>
+    <div class="note"><strong>Note — </strong><em>radiazioni elettromagnetiche</em>: onde che trasportano energia, come la luce, i raggi X, le microonde. <em>lunghezza d'onda</em>: distanza tra due creste consecutive di un'onda. <em>dispersione</em>: separazione della luce nei suoi colori componenti.</div>
+  </div>
+
+  <!-- D1 -->
+  <div class="q-card" id="cD1">
+    <div class="q-head"><div class="q-num">1</div>
+      <div class="q-text">Qual è la porzione dello spettro elettromagnetico visibile ai nostri occhi?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="D1" value="a"> a. Dalle microonde ai raggi X</label>
+      <label class="opt-label"><input type="radio" name="D1" value="b"> b. Dal violetto al rosso</label>
+      <label class="opt-label"><input type="radio" name="D1" value="c"> c. Solo la luce rossa e quella blu</label>
+      <label class="opt-label"><input type="radio" name="D1" value="d"> d. Dal rosso al violetto, escludendo il verde</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('D1','b','cD1')">Controlla</button>
+    <div class="feedback" id="fb-D1"></div>
+  </div>
+
+  <!-- D2 -->
+  <div class="q-card" id="cD2">
+    <div class="q-head"><div class="q-num">2</div>
+      <div class="q-text">Perché una foglia ci appare verde? Spiega con parole tue.</div></div>
+    <textarea class="q-textarea" id="D2" placeholder="Scrivi la tua spiegazione..."></textarea>
+    <button class="btn-check" onclick="checkLibero('D2','cD2',['riflette','verde','assorbe','rosso','blu'])">Controlla</button>
+    <div class="feedback" id="fb-D2"></div>
+  </div>
+
+  <!-- D3 abbinamento -->
+  <div class="q-card" id="cD3">
+    <div class="q-head"><div class="q-num">3</div>
+      <div class="q-text">Abbina ciascun fenomeno alla sua descrizione corretta.</div></div>
+    <table class="abbina-table">
+      <thead><tr><th>Fenomeno</th><th>Descrizione</th></tr></thead>
+      <tbody>
+        <tr><td>Dispersione</td>
+          <td><select id="d3a"><option value="">—</option>
+            <option>A. Le molecole dell'aria diffondono la luce blu in tutte le direzioni</option>
+            <option>B. La luce bianca si scompone nei colori attraverso un prisma</option>
+            <option>C. Un oggetto riflette tutte le lunghezze d'onda</option>
+            <option>D. I colori si propagano a velocità identica nel vuoto</option>
+          </select></td></tr>
+        <tr><td>Diffusione di Rayleigh</td>
+          <td><select id="d3b"><option value="">—</option>
+            <option>A. Le molecole dell'aria diffondono la luce blu in tutte le direzioni</option>
+            <option>B. La luce bianca si scompone nei colori attraverso un prisma</option>
+            <option>C. Un oggetto riflette tutte le lunghezze d'onda</option>
+            <option>D. I colori si propagano a velocità identica nel vuoto</option>
+          </select></td></tr>
+        <tr><td>Oggetto bianco</td>
+          <td><select id="d3c"><option value="">—</option>
+            <option>A. Le molecole dell'aria diffondono la luce blu in tutte le direzioni</option>
+            <option>B. La luce bianca si scompone nei colori attraverso un prisma</option>
+            <option>C. Un oggetto riflette tutte le lunghezze d'onda</option>
+            <option>D. I colori si propagano a velocità identica nel vuoto</option>
+          </select></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-check" onclick="checkAbbina(['d3a','d3b','d3c'],['B. La luce bianca si scompone nei colori attraverso un prisma','A. Le molecole dell\'aria diffondono la luce blu in tutte le direzioni','C. Un oggetto riflette tutte le lunghezze d\'onda'],'cD3')">Controlla</button>
+    <div class="feedback" id="fb-D3"></div>
+  </div>
+
+  <!-- D4 V/F -->
+  <div class="q-card" id="cD4">
+    <div class="q-head"><div class="q-num">4</div>
+      <div class="q-text">Indica se le seguenti affermazioni sono Vere (V) o False (F).</div></div>
+    <table class="vf-table">
+      <thead><tr><th>Affermazione</th><th>V</th><th>F</th></tr></thead>
+      <tbody>
+        <tr id="rD4-1"><td>1. La luce visibile comprende tutte le radiazioni elettromagnetiche.</td><td><input type="radio" name="vfD4_1" value="V"></td><td><input type="radio" name="vfD4_1" value="F"></td></tr>
+        <tr id="rD4-2"><td>2. Il rosso ha una lunghezza d'onda più lunga del violetto.</td><td><input type="radio" name="vfD4_2" value="V"></td><td><input type="radio" name="vfD4_2" value="F"></td></tr>
+        <tr id="rD4-3"><td>3. Un oggetto nero riflette quasi tutte le lunghezze d'onda.</td><td><input type="radio" name="vfD4_3" value="V"></td><td><input type="radio" name="vfD4_3" value="F"></td></tr>
+        <tr id="rD4-4"><td>4. La luce è usata in medicina per diagnosi e terapie.</td><td><input type="radio" name="vfD4_4" value="V"></td><td><input type="radio" name="vfD4_4" value="F"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-check" onclick="checkVF('D4',[{n:'vfD4_1',r:'F'},{n:'vfD4_2',r:'V'},{n:'vfD4_3',r:'F'},{n:'vfD4_4',r:'V'}])">Controlla</button>
+    <div class="feedback" id="fb-D4"></div>
+  </div>
+
+  <!-- D5 -->
+  <div class="q-card" id="cD5">
+    <div class="q-head"><div class="q-num">5</div>
+      <div class="q-text">Il testo è organizzato secondo quale struttura prevalente?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="D5" value="a"> a. Narrativa: racconta una storia con personaggi e vicende</label>
+      <label class="opt-label"><input type="radio" name="D5" value="b"> b. Espositiva: presenta e spiega fenomeni scientifici in modo ordinato</label>
+      <label class="opt-label"><input type="radio" name="D5" value="c"> c. Argomentativa: difende una tesi con argomenti contrari</label>
+      <label class="opt-label"><input type="radio" name="D5" value="d"> d. Descrittiva: descrive solo un oggetto fisico</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('D5','b','cD5')">Controlla</button>
+    <div class="feedback" id="fb-D5"></div>
+  </div>
+
+  <!-- D6 completamento -->
+  <div class="q-card" id="cD6">
+    <div class="q-head"><div class="q-num">6</div>
+      <div class="q-text">Completa le frasi scegliendo la parola corretta. <strong>Attenzione: 2 parole in più.</strong></div></div>
+    <div class="chips"><strong>Parole:</strong>
+      <span class="chip">dispersione</span><span class="chip">riflette</span><span class="chip">assorbe</span>
+      <span class="chip">prisma</span><span class="chip">blu</span><span class="chip">nero</span><span class="chip">bianca</span>
+    </div>
+    <div class="cloze-text">
+      Quando la luce
+      <select class="slot" id="d6a"><option value="">—</option><option>bianca</option><option>blu</option><option>nero</option><option>prisma</option></select>
+      attraversa un
+      <select class="slot" id="d6b"><option value="">—</option><option>prisma</option><option>dispersione</option><option>riflette</option><option>bianca</option></select>
+      di vetro, subisce la
+      <select class="slot" id="d6c"><option value="">—</option><option>dispersione</option><option>assorbe</option><option>blu</option><option>nero</option></select>.
+      Una foglia
+      <select class="slot" id="d6d"><option value="">—</option><option>riflette</option><option>assorbe</option><option>prisma</option><option>bianca</option></select>
+      le radiazioni verdi e
+      <select class="slot" id="d6e"><option value="">—</option><option>assorbe</option><option>riflette</option><option>dispersione</option><option>bianca</option></select>
+      quelle rosse e
+      <select class="slot" id="d6f"><option value="">—</option><option>blu</option><option>nero</option><option>prisma</option><option>bianca</option></select>.
+    </div>
+    <button class="btn-check" onclick="checkCloze(['d6a','d6b','d6c','d6d','d6e','d6f'],['bianca','prisma','dispersione','riflette','assorbe','blu'],'cD6')">Controlla</button>
+    <div class="feedback" id="fb-D6"></div>
+  </div>
+
+  <div class="nav-bottom">
+    <button class="btn-nav" onclick="showTab(2)">← Testo C</button>
+    <button class="btn-nav pri" onclick="showTab(4)">Lingua →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     RIFLESSIONE SULLA LINGUA
+════════════════════════════════════════ -->
+<div class="sez" id="s4">
+  <div class="sez-title"><span class="sez-tag">Lingua</span> Riflessione sulla lingua</div>
+
+  <!-- L1 POLISEMIA -->
+  <div class="q-card" id="cL1">
+    <div class="q-head"><div class="q-num">1</div>
+      <div class="q-text">La parola <strong>"rete"</strong> è polisémica (ha più significati). In quale delle seguenti frasi <em>"rete"</em> ha un significato diverso da tutte le altre?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="L1" value="a"> a. Il pescatore tirò su la rete dal mare.</label>
+      <label class="opt-label"><input type="radio" name="L1" value="b"> b. La rete da calcio era strappata.</label>
+      <label class="opt-label"><input type="radio" name="L1" value="c"> c. Il segnale della rete telefonica era assente.</label>
+      <label class="opt-label"><input type="radio" name="L1" value="d"> d. La farfalla era rimasta intrappolata nella rete del ragno.</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('L1','c','cL1')">Controlla</button>
+    <div class="feedback" id="fb-L1"></div>
+  </div>
+
+  <!-- L2 USO CORRETTO -->
+  <div class="q-card" id="cL2">
+    <div class="q-head"><div class="q-num">2</div>
+      <div class="q-text">In quale delle seguenti frasi il verbo è coniugato in modo <strong>scorretto</strong>?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="L2" value="a"> a. Se avessi studiato, avresti superato l'esame.</label>
+      <label class="opt-label"><input type="radio" name="L2" value="b"> b. Spero che tu venga alla festa domani.</label>
+      <label class="opt-label"><input type="radio" name="L2" value="c"> c. Vorrei che lui studiasse di più.</label>
+      <label class="opt-label"><input type="radio" name="L2" value="d"> d. Benché piove, usciremo lo stesso.</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('L2','d','cL2')">Controlla</button>
+    <div class="feedback" id="fb-L2"></div>
+  </div>
+
+  <!-- L3 PUNTEGGIATURA -->
+  <div class="q-card" id="cL3">
+    <div class="q-head"><div class="q-num">3</div>
+      <div class="q-text">Scegli la frase in cui la punteggiatura è usata <strong>correttamente</strong>.</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="L3" value="a"> a. Marco, studiò tutta la notte, ma non riuscì a dormire.</label>
+      <label class="opt-label"><input type="radio" name="L3" value="b"> b. La professoressa disse: «Aprite il libro a pagina quaranta.»</label>
+      <label class="opt-label"><input type="radio" name="L3" value="c"> c. Ho comprato: pane, latte e burro.</label>
+      <label class="opt-label"><input type="radio" name="L3" value="d"> d. Siamo stanchi, perciò, andiamo a dormire presto.</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('L3','b','cL3')">Controlla</button>
+    <div class="feedback" id="fb-L3"></div>
+  </div>
+
+  <!-- L4 ANALISI GRAMMATICALE -->
+  <div class="q-card" id="cL4">
+    <div class="q-head"><div class="q-num">4</div>
+      <div class="q-text">Indica la categoria grammaticale delle parole sottolineate nelle frasi seguenti.</div></div>
+    <table class="abbina-table">
+      <thead><tr><th>Frase</th><th>Categoria grammaticale</th></tr></thead>
+      <tbody>
+        <tr><td>«<u>Velocemente</u> mi allontanai dalla folla.»</td>
+          <td><select id="l4a"><option value="">—</option><option>Aggettivo qualificativo</option><option>Avverbio di modo</option><option>Sostantivo</option><option>Congiunzione</option></select></td></tr>
+        <tr><td>«Questo è il libro <u>più bello</u> che abbia mai letto.»</td>
+          <td><select id="l4b"><option value="">—</option><option>Avverbio + aggettivo (superlativo relativo)</option><option>Aggettivo comparativo di maggioranza</option><option>Pronome relativo</option><option>Avverbio di grado</option></select></td></tr>
+        <tr><td>«<u>Sebbene</u> fosse tardi, restammo a parlare.»</td>
+          <td><select id="l4c"><option value="">—</option><option>Preposizione</option><option>Avverbio temporale</option><option>Congiunzione concessiva</option><option>Pronome relativo</option></select></td></tr>
+        <tr><td>«Il gatto dormiva <u>sul</u> divano.»</td>
+          <td><select id="l4d"><option value="">—</option><option>Preposizione articolata</option><option>Avverbio di luogo</option><option>Articolo determinativo</option><option>Pronome dimostrativo</option></select></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-check" onclick="checkAbbina(['l4a','l4b','l4c','l4d'],['Avverbio di modo','Avverbio + aggettivo (superlativo relativo)','Congiunzione concessiva','Preposizione articolata'],'cL4')">Controlla</button>
+    <div class="feedback" id="fb-L4"></div>
+  </div>
+
+  <!-- L5 CHE relativo/congiunzione -->
+  <div class="q-card" id="cL5">
+    <div class="q-head"><div class="q-num">5</div>
+      <div class="q-text">Nelle frasi seguenti, indica se il <strong>"che"</strong> sottolineato è pronome relativo (R) o congiunzione (C).</div></div>
+    <table class="tri-table">
+      <thead><tr><th>Frase</th><th>R</th><th>C</th></tr></thead>
+      <tbody>
+        <tr id="rL5-1"><td>a. È il film <u>che</u> mi ha emozionato di più.</td><td><input type="radio" name="l5_1" value="R"></td><td><input type="radio" name="l5_1" value="C"></td></tr>
+        <tr id="rL5-2"><td>b. Credo <u>che</u> domani pioverà.</td><td><input type="radio" name="l5_2" value="R"></td><td><input type="radio" name="l5_2" value="C"></td></tr>
+        <tr id="rL5-3"><td>c. La ragazza <u>che</u> conosco si chiama Sofia.</td><td><input type="radio" name="l5_3" value="R"></td><td><input type="radio" name="l5_3" value="C"></td></tr>
+        <tr id="rL5-4"><td>d. È necessario <u>che</u> tu arrivi puntuale.</td><td><input type="radio" name="l5_4" value="R"></td><td><input type="radio" name="l5_4" value="C"></td></tr>
+        <tr id="rL5-5"><td>e. Il libro <u>che</u> ho comprato ieri è esaurito.</td><td><input type="radio" name="l5_5" value="R"></td><td><input type="radio" name="l5_5" value="C"></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-check" onclick="checkTri('L5',[{n:'l5_1',r:'R'},{n:'l5_2',r:'C'},{n:'l5_3',r:'R'},{n:'l5_4',r:'C'},{n:'l5_5',r:'R'}])">Controlla</button>
+    <div class="feedback" id="fb-L5"></div>
+  </div>
+
+  <!-- L6 SUBORDINATE -->
+  <div class="q-card" id="cL6">
+    <div class="q-head"><div class="q-num">6</div>
+      <div class="q-text">Riconosci il tipo di proposizione subordinata evidenziata.</div></div>
+    <table class="abbina-table">
+      <thead><tr><th>Frase</th><th>Tipo di subordinata</th></tr></thead>
+      <tbody>
+        <tr><td>«Studio molto <u>affinché i miei genitori siano fieri di me</u>.»</td>
+          <td><select id="l6a"><option value="">—</option><option>Causale</option><option>Finale</option><option>Consecutiva</option><option>Temporale</option><option>Concessiva</option></select></td></tr>
+        <tr><td>«<u>Quando arrivai</u>, la festa era già finita.»</td>
+          <td><select id="l6b"><option value="">—</option><option>Causale</option><option>Finale</option><option>Consecutiva</option><option>Temporale</option><option>Concessiva</option></select></td></tr>
+        <tr><td>«Non uscii <u>perché era tardi</u>.»</td>
+          <td><select id="l6c"><option value="">—</option><option>Causale</option><option>Finale</option><option>Consecutiva</option><option>Temporale</option><option>Concessiva</option></select></td></tr>
+        <tr><td>«<u>Sebbene fosse stanco</u>, continuò a camminare.»</td>
+          <td><select id="l6d"><option value="">—</option><option>Causale</option><option>Finale</option><option>Consecutiva</option><option>Temporale</option><option>Concessiva</option></select></td></tr>
+        <tr><td>«Era così felice <u>che si mise a piangere</u>.»</td>
+          <td><select id="l6e"><option value="">—</option><option>Causale</option><option>Finale</option><option>Consecutiva</option><option>Temporale</option><option>Concessiva</option></select></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-check" onclick="checkAbbina(['l6a','l6b','l6c','l6d','l6e'],['Finale','Temporale','Causale','Concessiva','Consecutiva'],'cL6')">Controlla</button>
+    <div class="feedback" id="fb-L6"></div>
+  </div>
+
+  <!-- L7 CONNETTIVI -->
+  <div class="q-card" id="cL7">
+    <div class="q-head"><div class="q-num">7</div>
+      <div class="q-text">Inserisci il connettivo logico più adatto tra quelli proposti. <strong>Attenzione: 2 connettivi in più.</strong></div></div>
+    <div class="chips"><strong>Connettivi:</strong>
+      <span class="chip">tuttavia</span><span class="chip">quindi</span><span class="chip">sebbene</span>
+      <span class="chip">poiché</span><span class="chip">inoltre</span><span class="chip">affinché</span><span class="chip">oppure</span>
+    </div>
+    <div class="cloze-text">
+      a. Ho studiato tutta la notte;
+      <select class="slot" id="l7a"><option value="">—</option><option>quindi</option><option>tuttavia</option><option>sebbene</option><option>poiché</option></select>
+      sono molto stanco.<br><br>
+      b.
+      <select class="slot" id="l7b"><option value="">—</option><option>Sebbene</option><option>Poiché</option><option>Tuttavia</option><option>Affinché</option></select>
+      facesse freddo, uscimmo lo stesso.<br><br>
+      c. Non ho capito la spiegazione;
+      <select class="slot" id="l7c"><option value="">—</option><option>tuttavia</option><option>quindi</option><option>poiché</option><option>inoltre</option></select>
+      chiederò di spiegarmela di nuovo.<br><br>
+      d. Parla lentamente
+      <select class="slot" id="l7d"><option value="">—</option><option>affinché</option><option>oppure</option><option>sebbene</option><option>quindi</option></select>
+      tutti possano capire.<br><br>
+      e.
+      <select class="slot" id="l7e"><option value="">—</option><option>Poiché</option><option>Tuttavia</option><option>Quindi</option><option>Sebbene</option></select>
+      era in ritardo, corse alla fermata.
+    </div>
+    <button class="btn-check" onclick="checkCloze(['l7a','l7b','l7c','l7d','l7e'],['quindi','Sebbene','tuttavia','affinché','Poiché'],'cL7')">Controlla</button>
+    <div class="feedback" id="fb-L7"></div>
+  </div>
+
+  <!-- L8 MODI E TEMPI VERBALI -->
+  <div class="q-card" id="cL8">
+    <div class="q-head"><div class="q-num">8</div>
+      <div class="q-text">Coniuga il verbo tra parentesi al modo e al tempo corretti.</div></div>
+    <div class="cloze-text" style="line-height:2.8">
+      a. Se tu <input type="text" id="l8a" placeholder="(studiare)..." style="border:none;border-bottom:2px solid var(--blue);background:transparent;font-size:0.9rem;width:150px;padding:0 4px;font-family:'DM Sans',sans-serif;"> di più, avresti preso un bel voto.<br>
+      b. Non credo che lui <input type="text" id="l8b" placeholder="(dire)..." style="border:none;border-bottom:2px solid var(--blue);background:transparent;font-size:0.9rem;width:120px;padding:0 4px;font-family:'DM Sans',sans-serif;"> la verità.<br>
+      c. Vorrei che tu <input type="text" id="l8c" placeholder="(venire)..." style="border:none;border-bottom:2px solid var(--blue);background:transparent;font-size:0.9rem;width:120px;padding:0 4px;font-family:'DM Sans',sans-serif;"> con me alla festa.<br>
+      d. Appena <input type="text" id="l8d" placeholder="(arrivare, lui)..." style="border:none;border-bottom:2px solid var(--blue);background:transparent;font-size:0.9rem;width:140px;padding:0 4px;font-family:'DM Sans',sans-serif;">, ti chiamerò subito.<br>
+      e. Pensavo che Maria <input type="text" id="l8e" placeholder="(partire)..." style="border:none;border-bottom:2px solid var(--blue);background:transparent;font-size:0.9rem;width:140px;padding:0 4px;font-family:'DM Sans',sans-serif;"> già.
+    </div>
+    <button class="btn-check" onclick="checkL8()">Controlla</button>
+    <div class="feedback" id="fb-L8"></div>
+  </div>
+
+  <!-- L9 LESSICO / DERIVAZIONE -->
+  <div class="q-card" id="cL9">
+    <div class="q-head"><div class="q-num">9</div>
+      <div class="q-text">Indica il significato del prefisso <strong>"dis-"</strong> nelle parole seguenti, scegliendo tra le opzioni proposte.</div></div>
+    <table class="abbina-table">
+      <thead><tr><th>Parola</th><th>Significato del prefisso</th></tr></thead>
+      <tbody>
+        <tr><td><strong>dis</strong>ordine</td>
+          <td><select id="l9a"><option value="">—</option><option>negazione / contrario</option><option>ripetizione</option><option>separazione</option><option>intensificazione</option></select></td></tr>
+        <tr><td><strong>dis</strong>persione</td>
+          <td><select id="l9b"><option value="">—</option><option>negazione / contrario</option><option>ripetizione</option><option>separazione / diffusione</option><option>diminuzione</option></select></td></tr>
+        <tr><td><strong>dis</strong>accordo</td>
+          <td><select id="l9c"><option value="">—</option><option>negazione / contrario</option><option>ripetizione</option><option>separazione</option><option>intensificazione</option></select></td></tr>
+      </tbody>
+    </table>
+    <button class="btn-check" onclick="checkAbbina(['l9a','l9b','l9c'],['negazione / contrario','separazione / diffusione','negazione / contrario'],'cL9')">Controlla</button>
+    <div class="feedback" id="fb-L9"></div>
+  </div>
+
+  <!-- L10 ANALISI DEL PERIODO -->
+  <div class="q-card" id="cL10">
+    <div class="q-head"><div class="q-num">10</div>
+      <div class="q-text">Nella frase: <span class="cit">«Benché avesse studiato molto, non riuscì a superare l'esame perché era troppo ansioso.»</span>
+      Quante proposizioni contiene il periodo?</div></div>
+    <div class="opts">
+      <label class="opt-label"><input type="radio" name="L10" value="a"> a. Una sola proposizione</label>
+      <label class="opt-label"><input type="radio" name="L10" value="b"> b. Due proposizioni</label>
+      <label class="opt-label"><input type="radio" name="L10" value="c"> c. Tre proposizioni</label>
+      <label class="opt-label"><input type="radio" name="L10" value="d"> d. Quattro proposizioni</label>
+    </div>
+    <button class="btn-check" onclick="checkMC('L10','c','cL10')">Controlla</button>
+    <div class="feedback" id="fb-L10"></div>
+  </div>
+
+  <div class="nav-bottom">
+    <button class="btn-nav" onclick="showTab(3)">← Testo D</button>
+    <button class="btn-nav pri" onclick="showTab(5)">📊 Risultati</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     RISULTATI
+════════════════════════════════════════ -->
+<div class="sez" id="s5">
+  <div class="risultati-wrap">
+    <div style="font-size:2.2rem;margin-bottom:8px">📊</div>
+    <h2 style="font-family:'Lora',serif;color:var(--navy);font-size:1.4rem;margin-bottom:18px">Riepilogo simulazione</h2>
+    <div id="ris-detail">
+      <p style="color:var(--slate);font-size:0.92rem">Clicca il pulsante per calcolare il punteggio finale. Assicurati di aver verificato tutte le risposte prima!</p>
+      <button class="btn-nav pri" style="margin-top:16px" onclick="calcRisultati()">Calcola punteggio</button>
+    </div>
+  </div>
+  <div class="nav-bottom">
+    <button class="btn-nav" onclick="showTab(4)">← Lingua</button>
+    <span></span>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ═══════════════════════════
+// STATO
+// ═══════════════════════════
+const S = {}; // cardId -> {ok: bool}
+const TOTAL_Q = 42;
+
+function reg(cardId, ok) {
+  S[cardId] = { ok };
+  updateProg();
+}
+
+function updateProg() {
+  const ans = Object.keys(S).length;
+  const ok = Object.values(S).filter(v=>v.ok).length;
+  document.getElementById('prog-bar').style.width = Math.min(Math.round(ans/TOTAL_Q*100),100)+'%';
+  document.getElementById('score-live').textContent = ok;
+  document.getElementById('ans-live').textContent = ans;
+}
+
+// ═══════════════════════════
+// TABS
+// ═══════════════════════════
+function showTab(i) {
+  document.querySelectorAll('.sez').forEach((s,j) => s.classList.toggle('on', i===j));
+  document.querySelectorAll('.tab-btn').forEach((b,j) => b.classList.toggle('on', i===j));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (i===5) calcRisultati();
+}
+
+// ═══════════════════════════
+// SCELTA MULTIPLA
+// ═══════════════════════════
+function checkMC(name, correct, cardId) {
+  const sel = document.querySelector(`input[name="${name}"]:checked`);
+  const fb = document.getElementById(`fb-${name}`);
+  if (!sel) { fb.className='feedback par'; fb.textContent='⚠ Seleziona una risposta prima di controllare.'; return; }
+  document.querySelectorAll(`input[name="${name}"]`).forEach(inp => {
+    const lbl = inp.closest('.opt-label');
+    lbl.classList.remove('ok','no','hint');
+    if (inp.value === correct) lbl.classList.add('hint');
+    if (inp.checked && inp.value !== correct) lbl.classList.add('no');
+    if (inp.checked && inp.value === correct) lbl.classList.add('ok');
+    inp.disabled = true;
+  });
+  const ok = sel.value === correct;
+  fb.className = 'feedback '+(ok?'ok':'no');
+  fb.textContent = ok ? '✓ Risposta corretta!' : '✗ Risposta errata. La risposta corretta è evidenziata in verde.';
+  document.querySelector(`#${cardId} .btn-check`).disabled = true;
+  reg(cardId, ok);
+}
+
+// ═══════════════════════════
+// TESTO LIBERO
+// ═══════════════════════════
+function checkLibero(fieldId, cardId, keywords) {
+  const val = document.getElementById(fieldId).value.trim().toLowerCase();
+  const fb = document.getElementById(`fb-${fieldId}`);
+  if (!val) { fb.className='feedback par'; fb.textContent='⚠ Scrivi una risposta prima di controllare.'; return; }
+  const ok = keywords.some(k => val.includes(k.toLowerCase()));
+  document.getElementById(fieldId).classList.add(ok?'ok':'no');
+  fb.className = 'feedback '+(ok?'ok':'no');
+  fb.textContent = ok ? '✓ Risposta corretta!' : '✗ La risposta non è precisa. Rileggi il testo con attenzione.';
+  document.querySelector(`#${cardId} .btn-check`).disabled = true;
+  reg(cardId, ok);
+}
+
+// ═══════════════════════════
+// COMPLETAMENTO (select)
+// ═══════════════════════════
+function checkCloze(ids, corrette, cardId) {
+  let ok = 0;
+  ids.forEach((id,i) => {
+    const el = document.getElementById(id);
+    const isOk = el.value.trim().toLowerCase() === corrette[i].toLowerCase();
+    el.classList.remove('ok','no');
+    if (el.value) el.classList.add(isOk?'ok':'no');
+    if (isOk) ok++;
+    el.disabled = true;
+  });
+  const fb = document.getElementById(`fb-${cardId.slice(1)}`);
+  const fb2 = document.getElementById(`fb-${cardId}`);
+  const fbEl = fb2||fb;
+  if (!fbEl) return;
+  if (ok===ids.length) { fbEl.className='feedback ok'; fbEl.textContent=`✓ Perfetto! ${ok}/${ids.length} corretti.`; }
+  else if (ok>0) { fbEl.className='feedback par'; fbEl.textContent=`◑ ${ok}/${ids.length} corretti. Le caselle in rosso vanno riviste.`; }
+  else { fbEl.className='feedback no'; fbEl.textContent=`✗ Nessuna risposta corretta. Riprova.`; }
+  document.querySelector(`#${cardId} .btn-check`).disabled = true;
+  reg(cardId, ok===ids.length);
+}
+
+// ═══════════════════════════
+// VERO/FALSO
+// ═══════════════════════════
+// Mappa righe per ciascuna domanda V/F
+const vfRows = {
+  A4: ['rA4-1','rA4-2','rA4-3','rA4-4','rA4-5'],
+  B4: ['rB4-1','rB4-2','rB4-3','rB4-4','rB4-5'],
+  C4: ['rC4-1','rC4-2','rC4-3','rC4-4','rC4-5'],
+  D4: ['rD4-1','rD4-2','rD4-3','rD4-4'],
+};
+function checkVF(name, dati) {
+  const cardId = 'c'+name;
+  const rows = vfRows[name]||[];
+  let ok = 0;
+  dati.forEach((d,i)=>{
+    const sel = document.querySelector(`input[name="${d.n}"]:checked`);
+    const row = document.getElementById(rows[i]);
+    if (row) row.classList.remove('r-ok','r-no');
+    const isOk = sel && sel.value===d.r;
+    if (row) row.classList.add(isOk?'r-ok':'r-no');
+    if (isOk) ok++;
+    document.querySelectorAll(`input[name="${d.n}"]`).forEach(r=>r.disabled=true);
+  });
+  const fb = document.getElementById(`fb-${name}`);
+  const tot = dati.length;
+  if (fb) {
+    if (ok===tot) { fb.className='feedback ok'; fb.textContent=`✓ Tutte corrette! (${ok}/${tot})`; }
+    else { fb.className='feedback par'; fb.textContent=`◑ ${ok}/${tot} corrette. Le righe in rosso vanno riviste.`; }
+  }
+  document.querySelector(`#${cardId} .btn-check`).disabled = true;
+  reg(cardId, ok===tot);
+}
+
+// ═══════════════════════════
+// TRI-COLONNA (R/C)
+// ═══════════════════════════
+const triRows = {
+  L5: ['rL5-1','rL5-2','rL5-3','rL5-4','rL5-5'],
+};
+function checkTri(name, dati) {
+  const cardId = 'c'+name;
+  const rows = triRows[name]||[];
+  let ok = 0;
+  dati.forEach((d,i)=>{
+    const sel = document.querySelector(`input[name="${d.n}"]:checked`);
+    const row = document.getElementById(rows[i]);
+    if (row) row.classList.remove('r-ok','r-no');
+    const isOk = sel && sel.value===d.r;
+    if (row) row.classList.add(isOk?'r-ok':'r-no');
+    if (isOk) ok++;
+    document.querySelectorAll(`input[name="${d.n}"]`).forEach(r=>r.disabled=true);
+  });
+  const fb = document.getElementById(`fb-${name}`);
+  const tot = dati.length;
+  if (fb) {
+    if (ok===tot) { fb.className='feedback ok'; fb.textContent=`✓ Tutte corrette! (${ok}/${tot})`; }
+    else { fb.className='feedback par'; fb.textContent=`◑ ${ok}/${tot} corrette.`; }
+  }
+  document.querySelector(`#${cardId} .btn-check`).disabled = true;
+  reg(cardId, ok===tot);
+}
+
+// ═══════════════════════════
+// ABBINAMENTO (select)
+// ═══════════════════════════
+function checkAbbina(ids, corrette, cardId) {
+  let ok = 0;
+  ids.forEach((id,i)=>{
+    const el = document.getElementById(id);
+    const isOk = el.value===corrette[i];
+    el.classList.remove('ok','no');
+    if (el.value) el.classList.add(isOk?'ok':'no');
+    if (isOk) ok++;
+    el.disabled = true;
+  });
+  const fb = document.getElementById(`fb-${cardId.replace('c','')}`);
+  const fb2 = document.getElementById(`fb-${cardId}`);
+  const fbEl = fb2||fb;
+  if (!fbEl) return;
+  if (ok===ids.length) { fbEl.className='feedback ok'; fbEl.textContent=`✓ Tutti corretti! (${ok}/${ids.length})`; }
+  else { fbEl.className='feedback par'; fbEl.textContent=`◑ ${ok}/${ids.length} corretti.`; }
+  document.querySelector(`#${cardId} .btn-check`).disabled = true;
+  reg(cardId, ok===ids.length);
+}
+
+// ═══════════════════════════
+// RANKING (drag & drop)
+// ═══════════════════════════
+function initRank(listId) {
+  const list = document.getElementById(listId);
+  if (!list) return;
+  let dragEl = null;
+  list.querySelectorAll('.rank-item').forEach(item=>{
+    item.addEventListener('dragstart',()=>{ dragEl=item; item.classList.add('dragging'); setTimeout(()=>item.style.opacity='.4',0); });
+    item.addEventListener('dragend',()=>{ item.classList.remove('dragging'); item.style.opacity='1'; updateNums(listId); });
+    item.addEventListener('dragover',e=>{ e.preventDefault(); item.classList.add('over'); });
+    item.addEventListener('dragleave',()=>item.classList.remove('over'));
+    item.addEventListener('drop',e=>{ e.preventDefault(); item.classList.remove('over');
+      if (dragEl&&dragEl!==item) {
+        const items=[...list.querySelectorAll('.rank-item')];
+        const fi=items.indexOf(dragEl), ti=items.indexOf(item);
+        if (fi<ti) item.after(dragEl); else item.before(dragEl);
+        updateNums(listId);
+      }
+    });
+  });
+  updateNums(listId);
+}
+
+function updateNums(listId) {
+  document.getElementById(listId).querySelectorAll('.rank-item').forEach((item,i)=>{
+    item.querySelector('.rnum').textContent = i+1;
+  });
+}
+
+function checkRank(listId, correct, cardId) {
+  const items=[...document.getElementById(listId).querySelectorAll('.rank-item')];
+  let ok=0;
+  items.forEach((item,i)=>{
+    item.classList.remove('ok','no');
+    const isOk = item.dataset.v===correct[i];
+    item.classList.add(isOk?'ok':'no');
+    if (isOk) ok++;
+  });
+  const fb = document.getElementById(`fb-${cardId.slice(1)}`);
+  const fb2 = document.getElementById(`fb-${cardId}`);
+  const fbEl = fb2||fb;
+  if (!fbEl) return;
+  if (ok===correct.length) { fbEl.className='feedback ok'; fbEl.textContent=`✓ Ordine corretto!`; }
+  else { fbEl.className='feedback par'; fbEl.textContent=`◑ ${ok}/${correct.length} posizioni corrette. Ordine atteso: ${correct.join(' → ')}`; }
+  document.querySelector(`#${cardId} .btn-check`).disabled = true;
+  reg(cardId, ok===correct.length);
+}
+
+// ═══════════════════════════
+// L8 — VERBI
+// ═══════════════════════════
+const l8sol = {
+  l8a: ['avessi studiato','studiato'],
+  l8b: ['dica','abbia detto'],
+  l8c: ['venissi','venga'],
+  l8d: ['arriverà','arriva','sarà arrivato'],
+  l8e: ['fosse partita','era partita','partisse']
+};
+function checkL8() {
+  let ok=0;
+  ['l8a','l8b','l8c','l8d','l8e'].forEach(id=>{
+    const el=document.getElementById(id);
+    const val=el.value.trim().toLowerCase();
+    const isOk=l8sol[id].some(s=>val.includes(s.toLowerCase()));
+    el.style.borderBottom=`2px solid ${isOk?'var(--ok)':'var(--err)'}`;
+    el.style.background=isOk?'var(--ok-bg)':'var(--err-bg)';
+    if (isOk) ok++;
+    el.disabled=true;
+  });
+  const fb=document.getElementById('fb-L8');
+  if (ok===5){fb.className='feedback ok';fb.textContent=`✓ Tutte le forme corrette! (${ok}/5)`;}
+  else{fb.className='feedback par';fb.textContent=`◑ ${ok}/5 corrette. Le caselle in rosso vanno riviste.`;}
+  document.querySelector('#cL8 .btn-check').disabled=true;
+  reg('cL8', ok===5);
+}
+
+// ═══════════════════════════
+// RISULTATI FINALI
+// ═══════════════════════════
+function calcRisultati() {
+  const ans = Object.keys(S).length;
+  const ok = Object.values(S).filter(v=>v.ok).length;
+  const no = ans - ok;
+  const noAns = TOTAL_Q - ans;
+  const perc = ans>0 ? Math.round(ok/ans*100) : 0;
+  let livello, badgeClass;
+  if (perc>=80){livello='🏆 Ottimo!';badgeClass='badge-ok';}
+  else if (perc>=60){livello='👍 Sufficiente';badgeClass='badge-par';}
+  else{livello='📖 Da rivedere';badgeClass='badge-no';}
+
+  document.getElementById('ris-detail').innerHTML=`
+    <div class="score-big">${ok}<span style="font-size:1.5rem;color:var(--slate)"> / ${ans}</span></div>
+    <div class="score-sub">risposte corrette su quelle verificate</div>
+    <div class="badge-livello ${badgeClass}">${livello}</div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-num" style="color:var(--ok)">${ok}</div><div class="stat-lbl">Corrette</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--err)">${no}</div><div class="stat-lbl">Errate</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--amber)">${noAns}</div><div class="stat-lbl">Non verificate</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--blue)">${perc}%</div><div class="stat-lbl">Percentuale</div></div>
+    </div>
+    <p style="margin-top:22px;font-size:0.84rem;color:var(--slate)">💡 Torna alle sezioni per rivedere le domande errate o non ancora verificate.</p>
+  `;
+}
+
+// ═══════════════════════════
+// INIT
+// ═══════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  initRank('rankC3');
+  updateProg();
+});
+</script>
+</body>
+</html>
